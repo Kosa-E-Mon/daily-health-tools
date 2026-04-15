@@ -6,301 +6,278 @@
 <title>FitLog</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <style>
-:root {
-  --bg: #07080f;
-  --surface: #0d1220;
-  --surface2: #141c2e;
-  --border: #1c2a42;
-  --accent: #00e676;
-  --accent-dim: rgba(0,230,118,0.12);
-  --accent-border: rgba(0,230,118,0.35);
-  --blue: #29b6f6;
-  --blue-dim: rgba(41,182,246,0.12);
-  --blue-border: rgba(41,182,246,0.35);
-  --orange: #ff9100;
-  --danger: #f44336;
-  --danger-dim: rgba(244,67,54,0.12);
-  --text: #e8ecf4;
-  --text2: #6e7d97;
-  --nav-h: 68px;
-  --radius: 14px;
+:root{
+  --bg:#07080f;--surface:#0d1220;--surface2:#141c2e;--border:#1c2a42;
+  --accent:#00e676;--accent-dim:rgba(0,230,118,0.12);--accent-border:rgba(0,230,118,0.35);
+  --blue:#29b6f6;--blue-dim:rgba(41,182,246,0.12);--blue-border:rgba(41,182,246,0.35);
+  --orange:#ff9100;--orange-dim:rgba(255,145,0,0.12);
+  --danger:#f44336;--danger-dim:rgba(244,67,54,0.12);
+  --text:#e8ecf4;--text2:#6e7d97;--nav-h:68px;--radius:14px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
-body {
-  font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-#app {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  position: relative;
-}
-.screen {
-  display: none;
-  padding: 16px 16px calc(var(--nav-h) + 24px);
-  min-height: 100vh;
-  animation: fadeUp .22s ease both;
-}
-.screen.active { display: block; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
- 
-/* ─── NAV ─── */
-#bottom-nav {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 480px; height: var(--nav-h);
-  background: rgba(13,18,32,.97);
-  border-top: 1px solid var(--border);
-  display: flex; z-index: 100;
-  backdrop-filter: blur(12px);
-}
-.nav-btn {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  background: none; border: none; color: var(--text2);
-  font-size: 9px; font-family: 'Noto Sans JP', sans-serif;
-  cursor: pointer; transition: color .18s; padding: 0;
-}
-.nav-btn .nicon { font-size: 20px; transition: transform .18s; }
-.nav-btn.active { color: var(--accent); }
-.nav-btn.active .nicon { transform: scale(1.15); }
- 
-/* ─── TYPOGRAPHY ─── */
-.screen-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 30px; letter-spacing: 3px; color: var(--text);
-}
-.screen-header {
-  display: flex; align-items: center;
-  justify-content: space-between; padding: 10px 0 18px;
-}
-.stat-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 42px; line-height: 1; color: var(--accent);
-}
-.stat-unit { font-size: 13px; color: var(--text2); margin-left: 2px; }
-.stat-lbl { font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
- 
-/* ─── CARDS ─── */
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-}
-.card-done { border-left: 3px solid var(--accent); }
-.card-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
- 
-/* ─── BUTTONS ─── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 10px 16px; border-radius: 10px; border: none;
-  font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: filter .15s, opacity .15s;
-  white-space: nowrap;
-}
-.btn:disabled { opacity: .4; pointer-events: none; }
-.btn:active { filter: brightness(.85); }
-.btn-primary { background: var(--accent); color: #000; font-weight: 700; }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
-.btn-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(244,67,54,.3); }
-.btn-full { width: 100%; margin-bottom: 8px; }
-a.btn { text-decoration: none; }
- 
-/* ─── FORMS ─── */
-.form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 6px; font-weight: 500; letter-spacing: .5px; }
-.form-input, .form-select {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 9px; padding: 10px 13px; color: var(--text);
-  font-family: 'Noto Sans JP', sans-serif; font-size: 14px; outline: none;
-  transition: border-color .2s; appearance: none;
-}
-.form-input:focus, .form-select:focus { border-color: var(--accent); }
-.form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%236e7d97'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.form-note { font-size: 11px; color: var(--text2); margin-top: 5px; }
-.required { color: var(--danger); }
- 
-/* ─── BADGES ─── */
-.badge { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.badge-g { background: var(--accent-dim); color: var(--accent); }
-.badge-b { background: var(--blue-dim); color: var(--blue); }
-.badge-o { background: rgba(255,145,0,.12); color: var(--orange); }
-.badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
- 
-/* ─── TODAY ─── */
-.today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.today-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
-.ex-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
- 
-/* ─── DAY TOGGLES ─── */
-.day-row { display: flex; gap: 5px; }
-.day-btn {
-  width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--surface2);
-  color: var(--text2); font-size: 11px; font-weight: 600;
-  font-family: 'Noto Sans JP', sans-serif;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-}
-.day-btn.on { background: var(--accent); border-color: var(--accent); color: #000; }
- 
-/* ─── TOGGLE SWITCH ─── */
-.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
-.sw { position: relative; width: 48px; height: 27px; flex-shrink: 0; }
-.sw input { display: none; }
-.sw-track {
-  position: absolute; inset: 0;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 14px; cursor: pointer; transition: .2s;
-}
-.sw-track::after {
-  content: ''; position: absolute; left: 4px; top: 4px;
-  width: 17px; height: 17px; border-radius: 50%;
-  background: var(--text2); transition: .2s;
-}
-.sw input:checked + .sw-track { background: var(--accent-dim); border-color: var(--accent); }
-.sw input:checked + .sw-track::after { left: 23px; background: var(--accent); }
- 
-/* ─── TABS ─── */
-.tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
-.tab { flex: 1; padding: 8px 4px; border: none; background: none; color: var(--text2); font-family: 'Noto Sans JP', sans-serif; font-size: 12px; border-radius: 7px; cursor: pointer; transition: all .15s; }
-.tab.active { background: var(--accent); color: #000; font-weight: 700; }
- 
-/* ─── CALENDAR ─── */
-.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cal-lbl { text-align: center; font-size: 10px; color: var(--text2); padding: 4px 0; }
-.cal-lbl.sun { color: #f44336; } .cal-lbl.sat { color: var(--blue); }
-.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 13px; position: relative; cursor: pointer; }
-.cal-day.empty { pointer-events: none; }
-.cal-day.today { border: 1.5px solid var(--accent); color: var(--accent); font-weight: 700; }
-.cal-day.done { background: var(--accent-dim); color: var(--accent); font-weight: 700; }
-.cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); position: absolute; bottom: 3px; }
-.cal-day.sun-c { color: rgba(244,67,54,.6); }
-.cal-day.sat-c { color: rgba(41,182,246,.6); }
- 
-/* ─── RECORD LIST ─── */
-.rec-item { padding: 13px 0; border-bottom: 1px solid var(--border); }
-.rec-item:last-child { border-bottom: none; }
-.rec-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-.rec-date { font-weight: 700; font-size: 14px; }
-.rec-cal { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); }
-.rec-detail { font-size: 11px; color: var(--text2); }
- 
-/* ─── GRAPH ─── */
-.graph-wrap { margin-bottom: 14px; }
-.graph-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
-.graph-tab { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all .15s; }
-.graph-tab.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent-border); }
-.chart-box { position: relative; height: 220px; }
- 
-/* ─── WEIGHT HISTORY ─── */
-.wh-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-.wh-item:last-child { border-bottom: none; }
- 
-/* ─── MODAL ─── */
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
-.overlay.hide { display: none; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px 20px 0 0; width: 100%; max-width: 480px;
-  max-height: 90vh; overflow-y: auto; padding: 20px;
-  animation: slideUp .25s ease;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
-.modal-close { background: none; border: none; color: var(--text2); font-size: 22px; cursor: pointer; line-height: 1; padding: 4px; }
- 
-/* ─── DETAIL MODAL ─── */
-.detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 250; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.detail-overlay.hide { display: none; }
-.detail-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; width: 100%; max-width: 400px; animation: fadeUp .2s ease; }
- 
-/* ─── TOAST ─── */
-.toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--surface2); border: 1px solid var(--accent-border); color: var(--accent); padding: 10px 22px; border-radius: 24px; font-size: 13px; z-index: 400; transition: transform .28s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.err { border-color: rgba(244,67,54,.5); color: var(--danger); }
- 
-/* ─── EMPTY ─── */
-.empty { text-align: center; padding: 40px 20px; color: var(--text2); }
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
-.empty-txt { font-size: 13px; line-height: 1.7; }
- 
-/* ─── MISC ─── */
-.section-lbl { font-size: 11px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; margin-top: 4px; }
-.divider { height: 1px; background: var(--border); margin: 12px 0; }
-.met-hint { font-size: 11px; color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; line-height: 1.7; margin-bottom: 14px; }
-.progress-bar-wrap { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 10px; }
-.progress-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s ease; }
-.cal-summary { display: flex; justify-content: space-around; text-align: center; }
-.cal-sum-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--accent); }
-.cal-sum-lbl { font-size: 11px; color: var(--text2); }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;}
+.screen{display:none;padding:16px 16px calc(var(--nav-h)+24px);min-height:100vh;animation:fadeUp .22s ease both;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* NAV */
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--nav-h);background:rgba(13,18,32,.97);border-top:1px solid var(--border);display:flex;z-index:100;backdrop-filter:blur(12px);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--text2);font-size:9px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:color .18s;padding:0;}
+.nav-btn .nicon{font-size:20px;transition:transform .18s;}
+.nav-btn.active{color:var(--accent);}
+.nav-btn.active .nicon{transform:scale(1.15);}
+
+/* TYPOGRAPHY */
+.screen-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;}
+.screen-header{display:flex;align-items:center;justify-content:space-between;padding:10px 0 18px;}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:var(--accent);}
+.stat-unit{font-size:13px;color:var(--text2);margin-left:2px;}
+.stat-lbl{font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.card-done{border-left:3px solid var(--accent);}
+.card-title{font-weight:700;font-size:15px;margin-bottom:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 16px;border-radius:10px;border:none;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:filter .15s,opacity .15s;white-space:nowrap;}
+.btn:disabled{opacity:.4;pointer-events:none;}
+.btn:active{filter:brightness(.85);}
+.btn-primary{background:var(--accent);color:#000;font-weight:700;}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-blue{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(244,67,54,.3);}
+.btn-full{width:100%;margin-bottom:8px;}
+a.btn{text-decoration:none;}
+
+/* FORMS */
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:500;letter-spacing:.5px;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;outline:none;transition:border-color .2s;appearance:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%236e7d97'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-textarea{resize:vertical;min-height:76px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-note{font-size:11px;color:var(--text2);margin-top:5px;}
+.required{color:var(--danger);}
+
+/* BADGES */
+.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-g{background:var(--accent-dim);color:var(--accent);}
+.badge-b{background:var(--blue-dim);color:var(--blue);}
+.badge-o{background:var(--orange-dim);color:var(--orange);}
+.badge-r{background:var(--danger-dim);color:var(--danger);}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+
+/* TODAY GRID */
+.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.today-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+
+/* IINE CARD */
+.iine-card{background:linear-gradient(135deg,rgba(255,145,0,.1),rgba(255,145,0,.05));border:1px solid rgba(255,145,0,.3);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.iine-num{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1;}
+.iine-label{font-size:11px;color:var(--orange);opacity:.8;letter-spacing:.5px;}
+.iine-thumb{font-size:36px;line-height:1;}
+
+/* EX ACTIONS */
+.ex-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+/* DAY BUTTONS */
+.day-row{display:flex;gap:5px;flex-wrap:wrap;}
+.day-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.day-btn.on{background:var(--accent);border-color:var(--accent);color:#000;}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
+.sw{position:relative;width:48px;height:27px;flex-shrink:0;}
+.sw input{display:none;}
+.sw-track{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);border-radius:14px;cursor:pointer;transition:.2s;}
+.sw-track::after{content:'';position:absolute;left:4px;top:4px;width:17px;height:17px;border-radius:50%;background:var(--text2);transition:.2s;}
+.sw input:checked+.sw-track{background:var(--accent-dim);border-color:var(--accent);}
+.sw input:checked+.sw-track::after{left:23px;background:var(--accent);}
+
+/* TABS */
+.tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:16px;}
+.tab{flex:1;padding:8px 4px;border:none;background:none;color:var(--text2);font-family:'Noto Sans JP',sans-serif;font-size:11px;border-radius:7px;cursor:pointer;transition:all .15s;}
+.tab.active{background:var(--accent);color:#000;font-weight:700;}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-month{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-lbl{text-align:center;font-size:10px;color:var(--text2);padding:4px 0;}
+.cal-lbl.sun{color:#f44336;}.cal-lbl.sat{color:var(--blue);}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;font-size:13px;position:relative;cursor:pointer;transition:transform .15s;}
+.cal-day:active{transform:scale(.9);}
+.cal-day.empty{pointer-events:none;}
+.cal-day.today{border:1.5px solid var(--accent);color:var(--accent);font-weight:700;}
+.cal-day.done{background:var(--orange-dim);border:1.5px solid rgba(255,145,0,.4);}
+.cal-day.done .cal-day-num{font-size:9px;color:var(--text2);}
+.cal-day.done .cal-iine{font-size:18px;line-height:1;}
+.cal-day-num{font-size:13px;}
+.cal-day.sun-c{color:rgba(244,67,54,.6);}.cal-day.sat-c{color:rgba(41,182,246,.6);}
+
+/* SCHEDULE WEEK VIEW */
+.week-day-card{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.week-day-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);}
+.week-day-name{font-weight:700;font-size:14px;}
+.week-day-cal{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);}
+.week-day-body{padding:8px 14px;}
+.week-ex-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.week-ex-row:last-child{border-bottom:none;}
+.week-ex-cal{color:var(--orange);font-weight:600;font-size:12px;flex-shrink:0;margin-left:8px;}
+.unscheduled-tag{background:var(--danger-dim);color:var(--danger);font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;}
+
+/* RECORD LIST */
+.rec-item{padding:13px 0;border-bottom:1px solid var(--border);}
+.rec-item:last-child{border-bottom:none;}
+.rec-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+.rec-date{font-weight:700;font-size:14px;}
+.rec-cal{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);}
+.rec-detail{font-size:11px;color:var(--text2);}
+
+/* GRAPH */
+.graph-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.graph-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;}
+.graph-tab.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border);}
+.chart-box{position:relative;height:220px;}
+
+/* WEIGHT HISTORY */
+.wh-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.wh-item:last-child{border-bottom:none;}
+
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:flex;align-items:flex-end;justify-content:center;}
+.overlay.hide{display:none;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+.modal-close{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;padding:4px;}
+
+/* CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;}
+.confirm-overlay.hide{display:none;}
+.confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:340px;animation:fadeUp .2s ease;}
+.confirm-msg{font-size:15px;line-height:1.7;margin-bottom:20px;text-align:center;}
+.confirm-btns{display:flex;gap:10px;}
+
+/* DETAIL */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px;}
+.detail-overlay.hide{display:none;}
+.detail-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:400px;animation:fadeUp .2s ease;}
+
+/* YOUTUBE PLAYER */
+.player-overlay{position:fixed;inset:0;background:#000;z-index:800;display:flex;flex-direction:column;}
+.player-overlay.hide{display:none;}
+#yt-player-slot{flex:1;width:100%;position:relative;}
+#yt-player-slot iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:none;}
+.player-topbar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(rgba(0,0,0,.7),transparent);}
+.player-title{font-size:13px;font-weight:600;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.player-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;flex-shrink:0;}
+.player-ended{position:absolute;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:20;}
+.player-ended.hide{display:none;}
+.player-ended-box{background:var(--surface);border:1px solid var(--accent-border);border-radius:var(--radius);padding:30px 24px;text-align:center;max-width:300px;width:90%;}
+.pe-icon{font-size:52px;margin-bottom:12px;}
+.pe-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;}
+.pe-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:22px;}
+
+/* HELP */
+.help-section{margin-bottom:20px;}
+.help-sec-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.help-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.help-num{width:22px;height:22px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.help-txt{font-size:13px;color:var(--text);line-height:1.6;}
+.help-note{background:var(--surface2);border-left:2px solid var(--accent);padding:9px 12px;border-radius:0 8px 8px 0;font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px;}
+
+/* GEMS CARD */
+.gems-card{background:var(--surface);border:1px solid var(--accent-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.gems-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-dim);color:var(--accent);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface2);border:1px solid var(--accent-border);color:var(--accent);padding:10px 22px;border-radius:24px;font-size:13px;z-index:1000;transition:transform .28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.err{border-color:rgba(244,67,54,.5);color:var(--danger);}
+
+/* MISC */
+.empty{text-align:center;padding:40px 20px;color:var(--text2);}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-txt{font-size:13px;line-height:1.7;}
+.section-lbl{font-size:11px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:10px;margin-top:4px;}
+.divider{height:1px;background:var(--border);margin:12px 0;}
+.met-hint{font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.8;margin-bottom:14px;}
+.progress-bar-wrap{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin-top:10px;}
+.progress-bar{height:100%;background:var(--accent);border-radius:4px;transition:width .4s ease;}
+.cal-summary{display:flex;justify-content:space-around;text-align:center;}
+.cal-sum-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);}
+.cal-sum-lbl{font-size:11px;color:var(--text2);}
 </style>
 </head>
 <body>
 <div id="app">
- 
-<!-- ══════════════════════════════════════════
-     SCREEN: 今日の運動
-══════════════════════════════════════════ -->
+
+<!-- ══ TODAY ══ -->
 <div id="screen-today" class="screen active">
   <div class="screen-header">
     <div class="screen-title">TODAY</div>
-    <div id="hdr-date" style="color:var(--text2);font-size:12px;font-weight:500;"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="hdr-date" style="color:var(--text2);font-size:12px;font-weight:500;"></div>
+      <button class="btn btn-secondary" onclick="showHelp()" style="padding:5px 11px;font-size:14px;font-weight:700;min-width:34px;">?</button>
+    </div>
+  </div>
+  <!-- 累計いいね -->
+  <div class="iine-card">
+    <div>
+      <div class="iine-label">累計消費カロリー</div>
+      <div><span class="iine-num" id="td-iine">0</span><span style="font-size:14px;color:var(--orange);margin-left:4px;">いいね</span></div>
+    </div>
+    <div class="iine-thumb">👍</div>
   </div>
   <div class="today-grid">
-    <div class="today-stat">
-      <div class="stat-lbl">基礎代謝</div>
-      <div><span class="stat-num" id="td-bmr">—</span><span class="stat-unit">kcal</span></div>
-    </div>
-    <div class="today-stat">
-      <div class="stat-lbl">今日の消費</div>
-      <div><span class="stat-num" id="td-cal">0</span><span class="stat-unit">kcal</span></div>
-    </div>
+    <div class="today-stat"><div class="stat-lbl">基礎代謝</div><div><span class="stat-num" id="td-bmr">—</span><span class="stat-unit">kcal</span></div></div>
+    <div class="today-stat"><div class="stat-lbl">今日の消費</div><div><span class="stat-num" id="td-cal">0</span><span class="stat-unit">kcal</span></div></div>
   </div>
   <div id="today-list"></div>
-  <button class="btn btn-primary btn-full" id="btn-save" onclick="saveToday()" style="margin-top:4px;">📝 今日の記録を保存</button>
+  <div id="today-save-area"></div>
 </div>
- 
-<!-- ══════════════════════════════════════════
-     SCREEN: 動画登録
-══════════════════════════════════════════ -->
+
+<!-- ══ VIDEOS ══ -->
 <div id="screen-videos" class="screen">
   <div class="screen-header">
     <div class="screen-title">動画登録</div>
     <button class="btn btn-primary" onclick="openVideoModal(null)" style="padding:8px 14px;">＋ 追加</button>
   </div>
+  <div class="gems-card">
+    <div class="gems-badge">🤖 Gem連携</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">フィットネス動画分析GemにURLを送ると、MET値・種目名・時間を分析してくれます。</p>
+    <a href="https://gemini.google.com/gem/14dCjC3ATwbMbKdvzTBaWp3h6SXJ1u2ax?usp=sharing" target="_blank" rel="noopener" class="btn btn-primary btn-full">🔗 フィットネス動画分析(FitLog連動)を開く</a>
+    <div class="form-group" style="margin-top:12px;margin-bottom:8px;">
+      <label class="form-label">GemのFITLOG出力を貼り付け</label>
+      <textarea class="form-textarea" id="fitlog-paste" placeholder="GemからコピーしたFITLOG:の行を貼り付け&#10;例: FITLOG:https://youtube.com/...,バーピー,9.0,18"></textarea>
+    </div>
+    <button class="btn btn-secondary btn-full" onclick="parseFitlogInput()" style="margin-bottom:0;">📥 取り込んで登録フォームに反映</button>
+  </div>
   <div id="video-list"></div>
 </div>
- 
-<!-- ══════════════════════════════════════════
-     SCREEN: スケジュール
-══════════════════════════════════════════ -->
+
+<!-- ══ SCHEDULE ══ -->
 <div id="screen-schedule" class="screen">
-  <div class="screen-header">
-    <div class="screen-title">スケジュール</div>
-  </div>
+  <div class="screen-header"><div class="screen-title">スケジュール</div></div>
+  <!-- 週間一覧 -->
+  <div class="section-lbl" style="margin-bottom:10px;">📅 週間スケジュール</div>
+  <div id="sch-week-view"></div>
+  <!-- 動画別設定 -->
+  <div class="section-lbl" style="margin:16px 0 10px;">⚙️ 各動画の設定</div>
   <div id="sch-list"></div>
 </div>
- 
-<!-- ══════════════════════════════════════════
-     SCREEN: 記録
-══════════════════════════════════════════ -->
+
+<!-- ══ RECORDS ══ -->
 <div id="screen-records" class="screen">
-  <div class="screen-header">
-    <div class="screen-title">記録</div>
-  </div>
+  <div class="screen-header"><div class="screen-title">記録</div></div>
   <div class="tabs">
     <button class="tab active" onclick="recTab('cal',this)">📅 カレンダー</button>
     <button class="tab" onclick="recTab('lst',this)">📋 一覧</button>
@@ -310,73 +287,46 @@ a.btn { text-decoration: none; }
   <div id="rec-lst" style="display:none;"></div>
   <div id="rec-grp" style="display:none;">
     <div class="graph-tabs">
-      <div class="graph-tab active" onclick="setGraphMode('week',this)" id="gtab-week">週別</div>
-      <div class="graph-tab" onclick="setGraphMode('month',this)" id="gtab-month">月別</div>
+      <div class="graph-tab active" onclick="setGraphMode('day',this)">日別</div>
+      <div class="graph-tab" onclick="setGraphMode('week',this)">週別</div>
+      <div class="graph-tab" onclick="setGraphMode('month',this)">月別</div>
     </div>
     <div class="chart-box"><canvas id="main-chart"></canvas></div>
   </div>
 </div>
- 
-<!-- ══════════════════════════════════════════
-     SCREEN: プロフィール設定
-══════════════════════════════════════════ -->
+
+<!-- ══ PROFILE ══ -->
 <div id="screen-profile" class="screen">
-  <div class="screen-header">
-    <div class="screen-title">プロフィール</div>
-  </div>
+  <div class="screen-header"><div class="screen-title">プロフィール</div></div>
   <div class="card">
     <div class="section-lbl">基本情報</div>
-    <div class="form-group">
-      <label class="form-label">お名前</label>
-      <input class="form-input" type="text" id="p-name" placeholder="名前（任意）">
+    <div class="form-group"><label class="form-label">お名前</label><input class="form-input" type="text" id="p-name" placeholder="名前（任意）"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">性別</label><select class="form-select" id="p-gender"><option value="male">男性</option><option value="female">女性</option></select></div>
+      <div class="form-group"><label class="form-label">年齢 <span class="required">*</span></label><input class="form-input" type="number" id="p-age" placeholder="歳" min="10" max="100"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">性別</label>
-        <select class="form-select" id="p-gender">
-          <option value="male">男性</option>
-          <option value="female">女性</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">年齢 <span class="required">*</span></label>
-        <input class="form-input" type="number" id="p-age" placeholder="歳" min="10" max="100">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">身長 (cm) <span class="required">*</span></label>
-        <input class="form-input" type="number" id="p-height" placeholder="cm" min="100" max="250">
-      </div>
-      <div class="form-group">
-        <label class="form-label">体重 (kg) <span class="required">*</span></label>
-        <input class="form-input" type="number" id="p-weight" step="0.1" placeholder="kg" min="30" max="300">
-      </div>
+      <div class="form-group"><label class="form-label">身長 (cm) <span class="required">*</span></label><input class="form-input" type="number" id="p-height" placeholder="cm"></div>
+      <div class="form-group"><label class="form-label">体重 (kg) <span class="required">*</span></label><input class="form-input" type="number" id="p-weight" step="0.1" placeholder="kg"></div>
     </div>
     <button class="btn btn-primary btn-full" onclick="saveProfile()">💾 保存</button>
   </div>
- 
-  <div class="card">
-    <div class="section-lbl">体重履歴</div>
-    <div id="wh-list"></div>
-  </div>
- 
+  <div class="card"><div class="section-lbl">体重履歴</div><div id="wh-list"></div></div>
   <div class="card">
     <div class="section-lbl">通知設定</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">スケジュール通知を使うには許可が必要です。アプリを開いている間のみ動作します。</p>
     <button class="btn btn-secondary btn-full" onclick="askNotifPerm()">🔔 通知を許可する</button>
     <div id="notif-status" style="font-size:12px;color:var(--text2);text-align:center;margin-top:6px;"></div>
   </div>
- 
   <div class="card">
     <div class="section-lbl">データエクスポート</div>
     <button class="btn btn-blue btn-full" onclick="exportCSV()">📊 CSV でエクスポート</button>
     <button class="btn btn-secondary btn-full" onclick="exportTXT()">📄 テキストでエクスポート</button>
   </div>
 </div>
- 
-</div><!-- #app -->
- 
+
+</div>
+
 <!-- ─── BOTTOM NAV ─── -->
 <nav id="bottom-nav">
   <button class="nav-btn active" onclick="goScreen('today',this)"><span class="nicon">🏃</span><span>今日</span></button>
@@ -385,8 +335,28 @@ a.btn { text-decoration: none; }
   <button class="nav-btn" onclick="goScreen('records',this)"><span class="nicon">📊</span><span>記録</span></button>
   <button class="nav-btn" onclick="goScreen('profile',this)"><span class="nicon">⚙️</span><span>設定</span></button>
 </nav>
- 
-<!-- ─── MODAL: 動画登録 ─── -->
+
+<!-- ═══ YOUTUBE PLAYER ═══ -->
+<div id="player-overlay" class="player-overlay hide">
+  <div style="position:relative;flex:1;width:100%;display:flex;flex-direction:column;">
+    <div id="yt-player-slot" style="flex:1;position:relative;"></div>
+    <div class="player-topbar">
+      <div class="player-title" id="player-title-txt"></div>
+      <button class="player-close" onclick="closePlayer()">✕ 閉じる</button>
+    </div>
+    <div id="player-ended" class="player-ended hide">
+      <div class="player-ended-box">
+        <div class="pe-icon">🎉</div>
+        <div class="pe-title">おつかれさまでした！</div>
+        <div class="pe-sub">動画が終わりました。<br>完了にしますか？</div>
+        <button class="btn btn-primary btn-full" onclick="playerConfirmDone()">✅ 完了にする</button>
+        <button class="btn btn-secondary btn-full" style="margin-bottom:0;" onclick="closePlayer()">閉じるだけ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 動画登録 ═══ -->
 <div id="video-overlay" class="overlay hide" onclick="closeVideoModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -397,30 +367,30 @@ a.btn { text-decoration: none; }
     <div class="form-group">
       <label class="form-label">YouTube URL <span class="required">*</span></label>
       <input class="form-input" type="url" id="v-url" placeholder="https://youtube.com/watch?v=xxx&t=0">
-      <div class="form-note">💡 タイムスタンプ付きURL（&t=秒数）を使うと運動開始地点から再生されます</div>
+      <div class="form-note">💡 タイムスタンプ付きURL（&amp;t=秒数）でエクササイズ開始地点から再生されます</div>
     </div>
-    <div class="form-group">
-      <label class="form-label">運動名</label>
-      <input class="form-input" type="text" id="v-name" placeholder="例: ジャンプエクササイズ">
-    </div>
+    <div class="form-group"><label class="form-label">種目名</label><input class="form-input" type="text" id="v-name" placeholder="例: ジャンピングジャック＆バーピー"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">MET値 <span class="required">*</span></label>
-        <input class="form-input" type="number" id="v-mets" step="0.5" min="1" max="20" placeholder="例: 8.0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">目安時間 (分)</label>
-        <input class="form-input" type="number" id="v-dur" min="1" max="180" placeholder="例: 20">
-      </div>
+      <div class="form-group"><label class="form-label">MET値 <span class="required">*</span></label><input class="form-input" type="number" id="v-mets" step="0.5" min="1" max="20" placeholder="例: 8.0"></div>
+      <div class="form-group"><label class="form-label">運動時間 (分)</label><input class="form-input" type="number" id="v-dur" min="1" max="180" placeholder="例: 18"></div>
     </div>
+    <!-- 消費カロリー表示 -->
+    <div id="v-cal-preview" style="display:none;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:9px;padding:10px 13px;margin-bottom:14px;font-size:13px;">
+      <span style="color:var(--text2);">推定消費カロリー: </span>
+      <span id="v-cal-num" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);"></span>
+      <span style="color:var(--text2);"> kcal</span>
+    </div>
+    <!-- 曜日設定 -->
     <div class="form-group">
-      <label class="form-label">メモ</label>
-      <input class="form-input" type="text" id="v-memo" placeholder="メモ（任意）">
+      <label class="form-label">実施曜日</label>
+      <div id="v-days" class="day-row"></div>
     </div>
+    <div class="form-group"><label class="form-label">メモ</label><input class="form-input" type="text" id="v-memo" placeholder="メモ（任意）"></div>
     <div class="met-hint">
-      📌 MET値の目安（Geminiで動画を分析して確認できます）<br>
-      ウォーキング: 3.5 ／ ヨガ: 2.5 ／ ストレッチ: 2.0<br>
-      エアロビクス: 6.0 ／ ジャンプ系: 8.0 ／ 有酸素高強度: 10.0
+      📌 MET値の目安（Gemで分析して確認できます）<br>
+      ストレッチ/ヨガ: 2.0〜2.5 ／ ウォーキング: 3.0〜4.0<br>
+      軽〜中程度の筋トレ: 3.5〜5.0 ／ エアロビクス: 6.0〜8.0<br>
+      ジャンピングジャック/縄跳び: 7.0〜9.0 ／ HIIT: 9.0〜12.0
     </div>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-secondary" style="flex:1" onclick="closeVideoModal()">キャンセル</button>
@@ -428,8 +398,8 @@ a.btn { text-decoration: none; }
     </div>
   </div>
 </div>
- 
-<!-- ─── MODAL: 日付詳細 ─── -->
+
+<!-- ═══ MODAL: 日付詳細 ═══ -->
 <div id="day-overlay" class="detail-overlay hide" onclick="closeDayDetail()">
   <div class="detail-box" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -439,343 +409,395 @@ a.btn { text-decoration: none; }
     <div id="day-content"></div>
   </div>
 </div>
- 
-<!-- ─── TOAST ─── -->
+
+<!-- ═══ MODAL: ヘルプ ═══ -->
+<div id="help-overlay" class="overlay hide" onclick="closeHelp(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">使い方ガイド</div>
+      <button class="modal-close" onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-section">
+      <div class="help-sec-title">🚀 はじめかた</div>
+      <div class="help-step"><div class="help-num">1</div><div class="help-txt">「設定」で身長・体重・年齢・性別を登録</div></div>
+      <div class="help-step"><div class="help-num">2</div><div class="help-txt">「動画登録」でエクササイズ動画を追加（曜日もここで設定できます）</div></div>
+      <div class="help-step"><div class="help-num">3</div><div class="help-txt">「スケジュール」で各動画の通知時刻を設定</div></div>
+      <div class="help-step"><div class="help-num">4</div><div class="help-txt">あとは毎日「今日」から運動するだけ！</div></div>
+    </div>
+    <div class="help-section">
+      <div class="help-sec-title">🤖 Gemで動画を分析する</div>
+      <div class="help-step"><div class="help-num">1</div><div class="help-txt">「動画登録」→「フィットネス動画分析(FitLog連動)を開く」をタップ</div></div>
+      <div class="help-step"><div class="help-num">2</div><div class="help-txt">GemにエクササイズのYouTube URLを送る</div></div>
+      <div class="help-step"><div class="help-num">3</div><div class="help-txt">出力されたコードブロックをコピー</div></div>
+      <div class="help-step"><div class="help-num">4</div><div class="help-txt">「FITLOG出力を貼り付け」に貼り付けて「取り込み」ボタンを押す</div></div>
+      <div class="help-note">💡 GemはURLをタイムスタンプ付きで生成し、休憩を除いた純粋な運動時間・具体的な種目名・MET値を分析してくれます</div>
+    </div>
+    <div class="help-section">
+      <div class="help-sec-title">📅 スケジュールのヒント</div>
+      <div class="help-step"><div class="help-num">▸</div><div class="help-txt">動画登録時またはスケジュール画面で曜日を設定できます</div></div>
+      <div class="help-step"><div class="help-num">▸</div><div class="help-txt">通知時刻は動画ごとに設定可能です</div></div>
+      <div class="help-step"><div class="help-num">▸</div><div class="help-txt">5日連続で未達成だと通知が自動でオフになります</div></div>
+    </div>
+    <div class="help-section" style="margin-bottom:0;">
+      <div class="help-sec-title">▶ 運動するとき</div>
+      <div class="help-step"><div class="help-num">▸</div><div class="help-txt">「スタート」ボタンで動画がアプリ内に全画面で開きます</div></div>
+      <div class="help-step"><div class="help-num">▸</div><div class="help-txt">動画終了後に「完了にする」か「閉じるだけ」を選べます</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRM ═══ -->
+<div id="confirm-overlay" class="confirm-overlay hide">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" style="flex:1;" id="confirm-cancel-btn">キャンセル</button>
+      <button class="btn btn-primary" style="flex:2;" id="confirm-ok-btn">確認</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
- 
+
 <script>
-// ════════════════════════════════════════════
-// DATA
-// ════════════════════════════════════════════
-const KEY = 'fitlog_v2';
- 
-function defData() {
-  return {
-    profile: { name:'', gender:'male', age:null, height:null, weightHistory:[] },
-    videos: [],
-    schedule: {},
-    records: [],
-    todayProgress: { date:'', done:[], }
-  };
+// ════ DATA ════
+const KEY='fitlog_v2';
+function defData(){return{profile:{name:'',gender:'male',age:null,height:null,weightHistory:[]},videos:[],schedule:{},records:[],todayProgress:{date:'',done:[]}};}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||defData();}catch{return defData();}}
+function save(){localStorage.setItem(KEY,JSON.stringify(D));}
+let D=load();
+
+// ════ UTILS ════
+const DAY_JP=['日','月','火','水','木','金','土'];
+const today=()=>new Date().toISOString().split('T')[0];
+const fmtDate=s=>{const d=new Date(s+'T00:00:00');return`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${DAY_JP[d.getDay()]})`};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const curWeight=()=>{const h=D.profile.weightHistory;return h&&h.length?h[h.length-1].weight:null;};
+const calcBMR=w=>{const p=D.profile;if(!p.age||!p.height||!w)return null;return p.gender==='male'?Math.round(88.362+13.397*w+4.799*p.height-5.677*p.age):Math.round(447.593+9.247*w+3.098*p.height-4.330*p.age);};
+const calcCal=(mets,w,min)=>Math.round(mets*w*(min/60)*1.05);
+const getYTId=url=>{const m=url.match(/(?:v=|youtu\.be\/)([^&?\s]+)/);return m?m[1]:null;};
+const getYTStart=url=>{const m=url.match(/[?&]t=(\d+)/);return m?parseInt(m[1]):0;};
+const totalIine=()=>D.records.reduce((s,r)=>s+r.totalCalories,0);
+
+// ════ CONFIRM ════
+function showConfirm(msg,okLabel='OK',danger=false){
+  return new Promise(resolve=>{
+    const ov=document.getElementById('confirm-overlay');
+    document.getElementById('confirm-msg').innerHTML=msg;
+    const ok=document.getElementById('confirm-ok-btn'),cx=document.getElementById('confirm-cancel-btn');
+    ok.textContent=okLabel;ok.className='btn '+(danger?'btn-danger':'btn-primary');ok.style.flex='2';
+    ov.classList.remove('hide');
+    const fn_ok=()=>{ov.classList.add('hide');cleanup();resolve(true);};
+    const fn_cx=()=>{ov.classList.add('hide');cleanup();resolve(false);};
+    const cleanup=()=>{ok.removeEventListener('click',fn_ok);cx.removeEventListener('click',fn_cx);};
+    ok.addEventListener('click',fn_ok);cx.addEventListener('click',fn_cx);
+  });
 }
- 
-function load() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || defData(); }
-  catch { return defData(); }
-}
-function save() { localStorage.setItem(KEY, JSON.stringify(D)); }
- 
-let D = load();
- 
-// ════════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════════
-const DAY_JP = ['日','月','火','水','木','金','土'];
-const today = () => new Date().toISOString().split('T')[0];
-const fmtDate = s => {
-  const d = new Date(s + 'T00:00:00');
-  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${DAY_JP[d.getDay()]})`;
-};
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
- 
-function curWeight() {
-  const h = D.profile.weightHistory;
-  return h && h.length ? h[h.length-1].weight : null;
-}
- 
-function calcBMR(w) {
-  const p = D.profile;
-  if (!p.age || !p.height || !w) return null;
-  return p.gender === 'male'
-    ? Math.round(88.362 + 13.397*w + 4.799*p.height - 5.677*p.age)
-    : Math.round(447.593 + 9.247*w + 3.098*p.height - 4.330*p.age);
-}
- 
-function calcCal(mets, w, min) {
-  return Math.round(mets * w * (min/60) * 1.05);
-}
- 
-// ════════════════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════════════════
-let currentScreen = 'today';
- 
-function goScreen(name, btn) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  currentScreen = name;
+
+// ════ NAVIGATION ════
+const renders={today:renderToday,videos:renderVideos,schedule:renderSchedule,records:()=>{if(activeRecTab==='cal')renderCal();else if(activeRecTab==='lst')renderLst();else renderGrp();},profile:renderProfile};
+function goScreen(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
   renders[name]();
 }
- 
-const renders = {
-  today: renderToday,
-  videos: renderVideos,
-  schedule: renderSchedule,
-  records: () => { if(activeRecTab==='cal') renderCal(); else if(activeRecTab==='lst') renderLst(); else renderGrp(); },
-  profile: renderProfile
-};
- 
-// ════════════════════════════════════════════
-// TODAY
-// ════════════════════════════════════════════
-function renderToday() {
-  const t = today();
-  document.getElementById('hdr-date').textContent = fmtDate(t);
- 
-  const w = curWeight();
-  const bmr = calcBMR(w);
-  document.getElementById('td-bmr').textContent = bmr || '—';
- 
-  // Reset progress if new day
-  if (D.todayProgress.date !== t) {
-    D.todayProgress = { date: t, done: [] };
-    save();
-  }
- 
-  const dow = new Date().getDay();
-  const sched = D.videos.filter(v => {
-    const s = D.schedule[v.id];
-    return s && s.days && s.days[dow];
-  });
- 
-  const container = document.getElementById('today-list');
-  const saved = D.records.find(r => r.date === t);
-  const done = D.todayProgress.done;
- 
-  // Calc total cal
-  let totalCal = 0;
-  if (w) {
-    done.forEach(id => {
-      const v = D.videos.find(x => x.id === id);
-      if (v) totalCal += calcCal(v.mets, w, v.duration || 20);
-    });
-  }
-  document.getElementById('td-cal').textContent = totalCal;
- 
-  if (!w) {
-    container.innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">⚙️</div><div class="empty-txt">「設定」で体重・身長を入力してください</div></div></div>`;
-    document.getElementById('btn-save').disabled = true;
-    return;
-  }
- 
-  if (sched.length === 0) {
-    container.innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">📅</div><div class="empty-txt">今日の予定はありません<br>「スケジュール」で曜日を設定しましょう</div></div></div>`;
-    document.getElementById('btn-save').disabled = true;
-    return;
-  }
- 
-  // Progress bar
-  const pct = Math.round(done.length / sched.length * 100);
-  let html = `<div class="card" style="margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
-      <span style="color:var(--text2);">今日の進捗</span>
-      <span style="color:var(--accent);font-weight:700;">${done.length}/${sched.length}</span>
-    </div>
-    <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
-  </div>`;
- 
-  for (const v of sched) {
-    const isDone = done.includes(v.id);
-    const cal = calcCal(v.mets, w, v.duration || 20);
-    html += `<div class="card ${isDone ? 'card-done' : ''}">
+
+// ════ TODAY ════
+function renderToday(){
+  const t=today();
+  document.getElementById('hdr-date').textContent=fmtDate(t);
+  const w=curWeight(),bmr=calcBMR(w);
+  document.getElementById('td-bmr').textContent=bmr||'—';
+  document.getElementById('td-iine').textContent=totalIine().toLocaleString();
+  if(D.todayProgress.date!==t){D.todayProgress={date:t,done:[]};save();}
+  const dow=new Date().getDay();
+  const sched=D.videos.filter(v=>{const s=D.schedule[v.id];return s&&s.days&&s.days[dow];});
+  const container=document.getElementById('today-list'),saveArea=document.getElementById('today-save-area');
+  const saved=D.records.find(r=>r.date===t),done=D.todayProgress.done;
+  let totalCal=0;
+  if(w)done.forEach(id=>{const v=D.videos.find(x=>x.id===id);if(v)totalCal+=calcCal(v.mets,w,v.duration||20);});
+  document.getElementById('td-cal').textContent=totalCal;
+  if(!w){container.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">⚙️</div><div class="empty-txt">「設定」で体重・身長を入力してください</div></div></div>`;saveArea.innerHTML='';return;}
+  if(!sched.length){container.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">📅</div><div class="empty-txt">今日の予定はありません<br>「スケジュール」で曜日を設定しましょう</div></div></div>`;saveArea.innerHTML='';return;}
+  const pct=Math.round(done.length/sched.length*100);
+  let html=`<div class="card" style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--text2);">今日の進捗</span><span style="color:var(--accent);font-weight:700;">${done.length}/${sched.length}</span></div><div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div></div>`;
+  for(const v of sched){
+    const isDone=done.includes(v.id),cal=w?calcCal(v.mets,w,v.duration||20):'—';
+    const encUrl=encodeURIComponent(v.url||''),encName=encodeURIComponent(v.name||'運動');
+    html+=`<div class="card ${isDone?'card-done':''}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div style="flex:1;">
-          <div class="card-title">${isDone ? '✅ ' : ''}${v.name || '運動'}</div>
-          <div class="badges">
-            <span class="badge badge-g">MET ${v.mets}</span>
-            <span class="badge badge-b">${v.duration || 20}分</span>
-            <span class="badge badge-o">${cal} kcal</span>
-          </div>
-          ${v.memo ? `<div style="font-size:11px;color:var(--text2);margin-top:4px;">${v.memo}</div>` : ''}
-        </div>
-        ${isDone ? '<div style="font-size:32px;margin-left:8px;">🏆</div>' : ''}
+        <div style="flex:1;"><div class="card-title">${isDone?'✅ ':''}${v.name||'運動'}</div>
+        <div class="badges"><span class="badge badge-g">MET ${v.mets}</span><span class="badge badge-b">${v.duration||20}分</span><span class="badge badge-o">${cal} kcal</span></div>
+        ${v.memo?`<div style="font-size:11px;color:var(--text2);margin-top:4px;">${v.memo}</div>`:''}</div>
+        ${isDone?'<div style="font-size:32px;margin-left:8px;">🏆</div>':''}
       </div>
-      <div class="ex-actions">
-        ${!saved ? `
-          <a href="${v.url}" target="_blank" rel="noopener" class="btn btn-blue">▶ スタート</a>
-          ${!isDone
-            ? `<button class="btn btn-primary" onclick="markDone('${v.id}')">✅ 完了</button>`
-            : `<button class="btn btn-secondary" onclick="markUndone('${v.id}')">↩ 取り消し</button>`
-          }
-        ` : `<span style="font-size:12px;color:var(--text2);">✅ 本日の記録は保存済みです</span>`}
-      </div>
+      <div class="ex-actions">${!saved?`
+        <button class="btn btn-blue" onclick="startVideo('${v.id}','${encUrl}','${encName}')" ${!v.url?'disabled':''}>▶ スタート</button>
+        ${!isDone?`<button class="btn btn-primary" onclick="markDone('${v.id}')">✅ 完了</button>`:`<button class="btn btn-secondary" onclick="markUndone('${v.id}')">↩ 取り消し</button>`}
+      `:`<span style="font-size:12px;color:var(--text2);">✅ 本日の記録は保存済みです</span>`}</div>
     </div>`;
   }
- 
-  container.innerHTML = html;
- 
-  const saveBtn = document.getElementById('btn-save');
-  if (saved) {
-    saveBtn.disabled = true;
-    saveBtn.textContent = '✅ 本日の記録は保存済みです';
-  } else {
-    saveBtn.disabled = done.length === 0;
-    saveBtn.textContent = '📝 今日の記録を保存';
+  container.innerHTML=html;
+  if(saved){saveArea.innerHTML=`<button class="btn btn-danger btn-full" onclick="undoTodayRecord()">🔓 本日の記録を解除する</button>`;}
+  else{saveArea.innerHTML=`<button class="btn btn-primary btn-full" id="btn-save" onclick="saveToday()" ${done.length===0?'disabled':''}>📝 今日の記録を保存</button>`;}
+}
+
+function markDone(id){if(!D.todayProgress.done.includes(id))D.todayProgress.done.push(id);save();renderToday();toast('✅ 完了しました！');}
+function markUndone(id){D.todayProgress.done=D.todayProgress.done.filter(x=>x!==id);save();renderToday();toast('↩ 取り消しました');}
+
+async function saveToday(){
+  const t=today(),w=curWeight();
+  if(!w){toast('体重を設定してください',true);return;}
+  const done=D.todayProgress.done;
+  if(!done.length){toast('完了した運動がありません',true);return;}
+  const dow=new Date().getDay();
+  const sched=D.videos.filter(v=>{const s=D.schedule[v.id];return s&&s.days&&s.days[dow];});
+  const undone=sched.filter(v=>!done.includes(v.id));
+  if(undone.length>0){
+    const ok=await showConfirm(`まだ完了していない運動があります。<br><br><span style="color:var(--orange);font-size:13px;">未達成: ${undone.map(v=>v.name||'運動').join('、')}</span><br><br>このまま今日の記録を保存しますか？`,'保存する');
+    if(!ok)return;
   }
+  const exercises=done.map(id=>{const v=D.videos.find(x=>x.id===id);if(!v)return null;return{videoId:id,name:v.name||'運動',mets:v.mets,duration:v.duration||20,calories:calcCal(v.mets,w,v.duration||20)};}).filter(Boolean);
+  const totalCal=exercises.reduce((s,e)=>s+e.calories,0),bmr=calcBMR(w);
+  D.videos.filter(v=>{const s=D.schedule[v.id];return s&&s.days&&s.days[dow];}).forEach(v=>{
+    const s=D.schedule[v.id];if(!s)return;
+    if(done.includes(v.id)){s.consecutiveMissed=0;}
+    else{s.consecutiveMissed=(s.consecutiveMissed||0)+1;if(s.consecutiveMissed>=5&&s.notificationEnabled){s.notificationEnabled=false;toast(`「${v.name}」の通知を停止しました（5日連続未達成）`,true);}}
+  });
+  D.records=D.records.filter(r=>r.date!==t);
+  D.records.push({date:t,weight:w,bmr:bmr||0,exercises,totalCalories:totalCal});
+  D.records.sort((a,b)=>a.date.localeCompare(b.date));
+  save();renderToday();toast('🎉 記録を保存しました！');
 }
- 
-function markDone(id) {
-  if (!D.todayProgress.done.includes(id)) D.todayProgress.done.push(id);
-  save(); renderToday(); toast('✅ 完了しました！');
+
+async function undoTodayRecord(){
+  const ok=await showConfirm('本日の記録を解除しますか？<br><span style="font-size:12px;color:var(--text2);">解除後は再度保存できます</span>','解除する',true);
+  if(!ok)return;
+  const t=today();D.records=D.records.filter(r=>r.date!==t);D.todayProgress={date:t,done:[]};
+  save();renderToday();toast('🔓 本日の記録を解除しました');
 }
-function markUndone(id) {
-  D.todayProgress.done = D.todayProgress.done.filter(x => x !== id);
-  save(); renderToday(); toast('↩ 取り消しました');
+
+// ════ YOUTUBE PLAYER ════
+let ytApiReady=false,ytPlayer=null,pendingVideo=null,activeExId=null,currentVideoUrl='';
+window.onYouTubeIframeAPIReady=function(){ytApiReady=true;if(pendingVideo){createYTPlayer(pendingVideo.ytId,pendingVideo.start);pendingVideo=null;}};
+
+function startVideo(exId,encodedUrl,encodedName){
+  const url=decodeURIComponent(encodedUrl),ytId=getYTId(url);
+  if(!ytId){toast('動画URLが正しくありません',true);return;}
+  activeExId=exId;currentVideoUrl=url;
+  const start=getYTStart(url);
+  document.getElementById('player-title-txt').textContent=decodeURIComponent(encodedName)||'運動中';
+  document.getElementById('player-ended').classList.add('hide');
+  document.getElementById('yt-player-slot').innerHTML='<div id="yt-player" style="position:absolute;inset:0;width:100%;height:100%;"></div>';
+  const ov=document.getElementById('player-overlay');ov.classList.remove('hide');
+  try{if(ov.requestFullscreen)ov.requestFullscreen();else if(ov.webkitRequestFullscreen)ov.webkitRequestFullscreen();}catch(e){}
+  if(ytApiReady)createYTPlayer(ytId,start);else pendingVideo={ytId,start};
 }
- 
-function saveToday() {
-  const t = today();
-  const w = curWeight();
-  if (!w) { toast('体重を設定してください', true); return; }
-  const done = D.todayProgress.done;
-  if (!done.length) { toast('完了した運動がありません', true); return; }
- 
-  const exercises = done.map(id => {
-    const v = D.videos.find(x => x.id === id);
-    if (!v) return null;
-    return { videoId: id, name: v.name||'運動', mets: v.mets, duration: v.duration||20, calories: calcCal(v.mets, w, v.duration||20) };
-  }).filter(Boolean);
- 
-  const totalCal = exercises.reduce((s,e) => s+e.calories, 0);
-  const bmr = calcBMR(w);
-  const dow = new Date().getDay();
- 
-  // Update consecutiveMissed
-  D.videos.filter(v => { const s=D.schedule[v.id]; return s && s.days && s.days[dow]; }).forEach(v => {
-    const s = D.schedule[v.id]; if (!s) return;
-    if (done.includes(v.id)) {
-      s.consecutiveMissed = 0;
-    } else {
-      s.consecutiveMissed = (s.consecutiveMissed||0) + 1;
-      if (s.consecutiveMissed >= 5 && s.notificationEnabled) {
-        s.notificationEnabled = false;
-        toast(`「${v.name}」の通知を停止しました（5日連続未達成）`, true);
-      }
+function createYTPlayer(ytId,start){
+  if(ytPlayer){try{ytPlayer.destroy();}catch(e){}ytPlayer=null;}
+  ytPlayer=new YT.Player('yt-player',{width:'100%',height:'100%',videoId:ytId,
+    playerVars:{autoplay:1,start,rel:0,modestbranding:1,playsinline:1,fs:1},
+    events:{
+      onStateChange:e=>{if(e.data===YT.PlayerState.ENDED)document.getElementById('player-ended').classList.remove('hide');},
+      onError:e=>{if(e.data===101||e.data===150){closePlayer();window.open(currentVideoUrl,'_blank');toast('この動画は埋め込みできないため別タブで開きました');}else toast('動画の読み込みに失敗しました',true);}
     }
   });
- 
-  D.records = D.records.filter(r => r.date !== t);
-  D.records.push({ date: t, weight: w, bmr: bmr||0, exercises, totalCalories: totalCal });
-  D.records.sort((a,b) => a.date.localeCompare(b.date));
-  save(); renderToday(); toast('🎉 記録を保存しました！');
 }
- 
-// ════════════════════════════════════════════
-// VIDEOS
-// ════════════════════════════════════════════
-function renderVideos() {
-  const el = document.getElementById('video-list');
-  if (!D.videos.length) {
-    el.innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">🎬</div><div class="empty-txt">動画が登録されていません<br>「＋ 追加」から登録しましょう</div></div></div>`;
-    return;
-  }
-  el.innerHTML = D.videos.map(v => {
-    const s = D.schedule[v.id];
-    const activeDays = s && s.days ? DAY_JP.filter((_,i) => s.days[i]).join('・') : 'なし';
-    return `<div class="card">
+function closePlayer(){
+  try{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}
+  document.getElementById('player-overlay').classList.add('hide');
+  document.getElementById('player-ended').classList.add('hide');
+  if(ytPlayer){try{ytPlayer.destroy();}catch(e){}ytPlayer=null;}
+  document.getElementById('yt-player-slot').innerHTML='';activeExId=null;
+}
+function playerConfirmDone(){const id=activeExId;closePlayer();if(id)markDone(id);}
+
+// ════ VIDEOS ════
+let modalDays=[false,false,false,false,false,false,false];
+
+function renderModalDays(){
+  document.getElementById('v-days').innerHTML=DAY_JP.map((d,i)=>
+    `<button type="button" class="day-btn ${modalDays[i]?'on':''}" onclick="toggleModalDay(${i})">${d}</button>`
+  ).join('');
+}
+function toggleModalDay(i){modalDays[i]=!modalDays[i];renderModalDays();updateCalPreview();}
+
+function updateCalPreview(){
+  const mets=parseFloat(document.getElementById('v-mets').value);
+  const dur=parseInt(document.getElementById('v-dur').value)||20;
+  const w=curWeight();
+  const preview=document.getElementById('v-cal-preview');
+  if(w&&mets&&mets>0){
+    document.getElementById('v-cal-num').textContent=calcCal(mets,w,dur);
+    preview.style.display='block';
+  } else {preview.style.display='none';}
+}
+
+function renderVideos(){
+  const el=document.getElementById('video-list');
+  const w=curWeight();
+  if(!D.videos.length){el.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">🎬</div><div class="empty-txt">動画が登録されていません<br>「＋ 追加」またはGemから取り込みましょう</div></div></div>`;return;}
+  el.innerHTML=D.videos.map(v=>{
+    const s=D.schedule[v.id];
+    const activeDays=s&&s.days?DAY_JP.filter((_,i)=>s.days[i]).join('・'):'なし';
+    const cal=w?calcCal(v.mets,w,v.duration||20):null;
+    return`<div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
         <div style="flex:1;min-width:0;">
-          <div class="card-title" style="word-break:break-all;">${v.name||'無題の運動'}</div>
+          <div class="card-title">${v.name||'無題の運動'}</div>
           <div class="badges">
             <span class="badge badge-g">MET ${v.mets}</span>
             <span class="badge badge-b">${v.duration||20}分</span>
+            ${cal?`<span class="badge badge-o">${cal} kcal</span>`:''}
           </div>
           <div style="font-size:11px;color:var(--text2);margin-top:6px;">📅 ${activeDays}</div>
-          ${v.memo ? `<div style="font-size:11px;color:var(--text2);margin-top:2px;">💬 ${v.memo}</div>` : ''}
-          ${v.url ? `<div style="font-size:10px;color:var(--text2);margin-top:3px;word-break:break-all;opacity:.7;">${v.url.substring(0,60)}${v.url.length>60?'...':''}</div>` : ''}
+          ${v.memo?`<div style="font-size:11px;color:var(--text2);margin-top:2px;">💬 ${v.memo}</div>`:''}
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;">
           <button class="btn btn-secondary" style="padding:7px 10px;" onclick="openVideoModal('${v.id}')">✏️</button>
           <button class="btn btn-danger" style="padding:7px 10px;" onclick="deleteVideo('${v.id}')">🗑️</button>
         </div>
       </div>
-      <div class="divider"></div>
-      <button class="btn btn-secondary btn-full" style="font-size:12px;" onclick="goScreen('schedule', document.querySelectorAll('.nav-btn')[2])">📅 スケジュールを設定</button>
     </div>`;
   }).join('');
 }
- 
-function openVideoModal(id) {
-  const v = id ? D.videos.find(x => x.id === id) : null;
-  document.getElementById('modal-title-txt').textContent = v ? '動画を編集' : '動画を追加';
-  document.getElementById('v-id').value = id||'';
-  document.getElementById('v-url').value = v ? v.url||'' : '';
-  document.getElementById('v-name').value = v ? v.name||'' : '';
-  document.getElementById('v-mets').value = v ? v.mets||'' : '';
-  document.getElementById('v-dur').value = v ? v.duration||'' : '';
-  document.getElementById('v-memo').value = v ? v.memo||'' : '';
+
+function parseFitlogInput(){
+  const text=document.getElementById('fitlog-paste').value;
+  const m=text.match(/FITLOG:([^,\n`\r]+),([^,\n`\r]+),([^,\n`\r]+),([^,\n`\r\s]+)/);
+  if(!m){toast('FITLOG形式が見つかりません',true);return;}
+  const url=m[1].trim(),name=m[2].trim(),mets=parseFloat(m[3].trim()),dur=parseInt(m[4].trim());
+  if(!url||!mets){toast('解析に失敗しました',true);return;}
+  openVideoModal(null);
+  setTimeout(()=>{
+    document.getElementById('v-url').value=url;
+    document.getElementById('v-name').value=name;
+    document.getElementById('v-mets').value=mets;
+    document.getElementById('v-dur').value=dur||20;
+    document.getElementById('fitlog-paste').value='';
+    updateCalPreview();
+    toast('✅ 取り込みました！内容を確認して保存してください');
+  },100);
+}
+
+function openVideoModal(id){
+  const v=id?D.videos.find(x=>x.id===id):null;
+  const s=id?(D.schedule[id]||null):null;
+  modalDays=s?[...s.days]:[false,false,false,false,false,false,false];
+  document.getElementById('modal-title-txt').textContent=v?'動画を編集':'動画を追加';
+  document.getElementById('v-id').value=id||'';
+  document.getElementById('v-url').value=v?v.url||'':'';
+  document.getElementById('v-name').value=v?v.name||'':'';
+  document.getElementById('v-mets').value=v?v.mets||'':'';
+  document.getElementById('v-dur').value=v?v.duration||'':'';
+  document.getElementById('v-memo').value=v?v.memo||'':'';
   document.getElementById('video-overlay').classList.remove('hide');
+  renderModalDays();
+  updateCalPreview();
+  // Attach input listeners for cal preview
+  ['v-mets','v-dur'].forEach(id=>document.getElementById(id).oninput=updateCalPreview);
 }
- 
-function closeVideoModal(e) {
-  if (e && e.target !== document.getElementById('video-overlay')) return;
-  document.getElementById('video-overlay').classList.add('hide');
-}
- 
-function saveVideo() {
-  const url = document.getElementById('v-url').value.trim();
-  const mets = parseFloat(document.getElementById('v-mets').value);
-  if (!url) { toast('URLは必須です', true); return; }
-  if (!mets || mets <= 0) { toast('MET値は必須です', true); return; }
- 
-  const data = {
-    url, mets,
-    name: document.getElementById('v-name').value.trim() || '運動',
-    duration: parseInt(document.getElementById('v-dur').value)||20,
-    memo: document.getElementById('v-memo').value.trim()
-  };
- 
-  const editId = document.getElementById('v-id').value;
-  if (editId) {
-    const i = D.videos.findIndex(x => x.id === editId);
-    if (i>-1) D.videos[i] = { ...D.videos[i], ...data };
+function closeVideoModal(e){if(e&&e.target!==document.getElementById('video-overlay'))return;document.getElementById('video-overlay').classList.add('hide');}
+
+function saveVideo(){
+  const url=document.getElementById('v-url').value.trim();
+  const mets=parseFloat(document.getElementById('v-mets').value);
+  if(!url){toast('URLは必須です',true);return;}
+  if(!mets||mets<=0){toast('MET値は必須です',true);return;}
+  const data={url,mets,name:document.getElementById('v-name').value.trim()||'運動',duration:parseInt(document.getElementById('v-dur').value)||20,memo:document.getElementById('v-memo').value.trim()};
+  const editId=document.getElementById('v-id').value;
+  if(editId){
+    const i=D.videos.findIndex(x=>x.id===editId);
+    if(i>-1)D.videos[i]={...D.videos[i],...data};
+    if(!D.schedule[editId])D.schedule[editId]={days:[false,false,false,false,false,false,false],notificationTime:'07:00',notificationEnabled:false,consecutiveMissed:0};
+    D.schedule[editId].days=[...modalDays];
   } else {
-    data.id = uid();
-    D.videos.push(data);
-    D.schedule[data.id] = { days:[false,false,false,false,false,false,false], notificationTime:'07:00', notificationEnabled:false, consecutiveMissed:0 };
+    data.id=uid();D.videos.push(data);
+    D.schedule[data.id]={days:[...modalDays],notificationTime:'07:00',notificationEnabled:false,consecutiveMissed:0};
   }
-  save();
-  document.getElementById('video-overlay').classList.add('hide');
-  renderVideos();
-  toast('✅ 動画を保存しました');
+  save();document.getElementById('video-overlay').classList.add('hide');renderVideos();toast('✅ 動画を保存しました');
 }
- 
-function deleteVideo(id) {
-  const v = D.videos.find(x => x.id === id);
-  if (!confirm(`「${v ? v.name : '動画'}」を削除しますか？`)) return;
-  D.videos = D.videos.filter(x => x.id !== id);
-  delete D.schedule[id];
-  save(); renderVideos(); toast('削除しました');
+
+async function deleteVideo(id){
+  const v=D.videos.find(x=>x.id===id);
+  const ok=await showConfirm(`「${v?v.name:'動画'}」を削除しますか？`,'削除する',true);
+  if(!ok)return;
+  D.videos=D.videos.filter(x=>x.id!==id);delete D.schedule[id];
+  save();renderVideos();toast('削除しました');
 }
- 
-// ════════════════════════════════════════════
-// SCHEDULE
-// ════════════════════════════════════════════
-function renderSchedule() {
-  const el = document.getElementById('sch-list');
-  if (!D.videos.length) {
-    el.innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">📅</div><div class="empty-txt">まず「動画登録」から動画を追加してください</div></div></div>`;
-    return;
+
+// ════ SCHEDULE ════
+function renderSchedule(){
+  const w=curWeight();
+
+  // ─── 週間ビュー ───
+  const weekEl=document.getElementById('sch-week-view');
+  let weekHtml='';
+  for(let i=1;i<=7;i++){
+    const dow=i%7; // 月=1…日=0
+    const dayVids=D.videos.filter(v=>{const s=D.schedule[v.id];return s&&s.days&&s.days[dow];});
+    const dayTotal=w?dayVids.reduce((s,v)=>s+calcCal(v.mets,w,v.duration||20),0):null;
+    const dayColor=dow===0?'#f44336':dow===6?'var(--blue)':'var(--text)';
+    weekHtml+=`<div class="week-day-card">
+      <div class="week-day-header">
+        <div class="week-day-name" style="color:${dayColor};">${DAY_JP[dow]}曜日</div>
+        ${dayVids.length?`<div style="display:flex;align-items:baseline;gap:4px;">
+          ${w&&dayTotal?`<span class="week-day-cal">${dayTotal}</span><span style="font-size:11px;color:var(--text2);">kcal</span>`:''}
+          <span class="badge badge-b" style="margin-left:6px;">${dayVids.length}本</span>
+        </div>`:`<span style="font-size:12px;color:var(--text2);">設定なし</span>`}
+      </div>
+      ${dayVids.length?`<div class="week-day-body">${dayVids.map(v=>{
+        const cal=w?calcCal(v.mets,w,v.duration||20):null;
+        return`<div class="week-ex-row">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.name||'運動'}</div>
+            <div style="font-size:11px;color:var(--text2);">MET${v.mets} × ${v.duration||20}分</div>
+          </div>
+          ${cal?`<div class="week-ex-cal">${cal} kcal</div>`:''}
+        </div>`;
+      }).join('')}</div>`:''}
+    </div>`;
   }
-  el.innerHTML = D.videos.map(v => {
-    const s = D.schedule[v.id] || { days:[false,false,false,false,false,false,false], notificationTime:'07:00', notificationEnabled:false, consecutiveMissed:0 };
-    const missed = s.consecutiveMissed || 0;
-    return `<div class="card">
-      <div class="card-title">${v.name||'運動'}</div>
-      <div class="section-lbl" style="margin-top:2px;">実施曜日</div>
-      <div class="day-row">${DAY_JP.map((d,i) => `<button class="day-btn ${s.days[i]?'on':''}" onclick="toggleDay('${v.id}',${i})">${d}</button>`).join('')}</div>
+  // 未設定動画
+  const unscheduled=D.videos.filter(v=>{const s=D.schedule[v.id];return!s||!s.days||!s.days.some(Boolean);});
+  if(unscheduled.length){
+    weekHtml+=`<div class="week-day-card" style="border-color:rgba(244,67,54,.3);">
+      <div class="week-day-header" style="background:var(--danger-dim);">
+        <div class="week-day-name" style="color:var(--danger);">曜日未設定</div>
+        <span class="badge badge-r">${unscheduled.length}本</span>
+      </div>
+      <div class="week-day-body">${unscheduled.map(v=>`<div class="week-ex-row">
+        <div style="flex:1;">${v.name||'運動'}<br><span style="font-size:11px;color:var(--text2);">MET${v.mets} × ${v.duration||20}分</span></div>
+        <button class="btn btn-secondary" style="padding:5px 10px;font-size:11px;" onclick="openVideoModal('${v.id}')">曜日を設定</button>
+      </div>`).join('')}</div>
+    </div>`;
+  }
+  if(!D.videos.length){weekHtml=`<div class="card"><div class="empty"><div class="empty-icon">📅</div><div class="empty-txt">まず「動画登録」から動画を追加してください</div></div></div>`;}
+  weekEl.innerHTML=weekHtml;
+
+  // ─── 動画別設定 ───
+  const el=document.getElementById('sch-list');
+  if(!D.videos.length){el.innerHTML='';return;}
+  el.innerHTML=D.videos.map(v=>{
+    const s=D.schedule[v.id]||{days:[false,false,false,false,false,false,false],notificationTime:'07:00',notificationEnabled:false,consecutiveMissed:0};
+    const missed=s.consecutiveMissed||0;
+    const cal=w?calcCal(v.mets,w,v.duration||20):null;
+    return`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div class="card-title" style="margin-bottom:4px;">${v.name||'運動'}</div>
+        ${cal?`<span class="badge badge-o" style="flex-shrink:0;">${cal} kcal/回</span>`:''}
+      </div>
+      <div class="section-lbl">実施曜日</div>
+      <div class="day-row">${DAY_JP.map((d,i)=>`<button class="day-btn ${s.days[i]?'on':''}" onclick="toggleDay('${v.id}',${i})">${d}</button>`).join('')}</div>
       <div class="divider"></div>
       <div class="toggle-row">
         <div>
           <div style="font-weight:500;font-size:14px;">通知</div>
           <div style="font-size:11px;color:${missed>=5?'var(--danger)':'var(--text2)'};">${missed>=5?'⚠️ 5日連続未達成 → 自動停止中':`連続未達成: ${missed}日`}</div>
         </div>
-        <label class="sw">
-          <input type="checkbox" ${s.notificationEnabled?'checked':''} onchange="toggleNotif('${v.id}',this.checked)">
-          <span class="sw-track"></span>
-        </label>
+        <label class="sw"><input type="checkbox" ${s.notificationEnabled?'checked':''} onchange="toggleNotif('${v.id}',this.checked)"><span class="sw-track"></span></label>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
         <span style="font-size:13px;color:var(--text2);white-space:nowrap;">通知時刻</span>
@@ -784,312 +806,171 @@ function renderSchedule() {
     </div>`;
   }).join('');
 }
- 
-function toggleDay(vid, i) {
-  if (!D.schedule[vid]) D.schedule[vid] = { days:[false,false,false,false,false,false,false], notificationTime:'07:00', notificationEnabled:false, consecutiveMissed:0 };
-  D.schedule[vid].days[i] = !D.schedule[vid].days[i];
-  save(); renderSchedule();
+
+function toggleDay(vid,i){
+  if(!D.schedule[vid])D.schedule[vid]={days:[false,false,false,false,false,false,false],notificationTime:'07:00',notificationEnabled:false,consecutiveMissed:0};
+  D.schedule[vid].days[i]=!D.schedule[vid].days[i];save();renderSchedule();
 }
- 
-function toggleNotif(vid, val) {
-  if (!D.schedule[vid]) return;
-  if (val) {
-    askNotifPerm(() => {
-      D.schedule[vid].notificationEnabled = true;
-      D.schedule[vid].consecutiveMissed = 0;
-      save(); renderSchedule();
-    });
-  } else {
-    D.schedule[vid].notificationEnabled = false;
-    save();
-  }
+function toggleNotif(vid,val){
+  if(!D.schedule[vid])return;
+  if(val){askNotifPerm(()=>{D.schedule[vid].notificationEnabled=true;D.schedule[vid].consecutiveMissed=0;save();renderSchedule();});}
+  else{D.schedule[vid].notificationEnabled=false;save();}
 }
- 
-function setNotifTime(vid, t) {
-  if (D.schedule[vid]) { D.schedule[vid].notificationTime = t; save(); }
-}
- 
-// ════════════════════════════════════════════
-// RECORDS
-// ════════════════════════════════════════════
-let activeRecTab = 'cal';
-let calCurDate = new Date();
-let chart = null;
-let graphMode = 'week';
- 
-function recTab(tab, btn) {
-  document.querySelectorAll('#screen-records .tab').forEach(t => t.classList.remove('active'));
+function setNotifTime(vid,t){if(D.schedule[vid]){D.schedule[vid].notificationTime=t;save();}}
+
+// ════ RECORDS ════
+let activeRecTab='cal',calCurDate=new Date(),chart=null,graphMode='day';
+
+function recTab(tab,btn){
+  document.querySelectorAll('#screen-records .tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['cal','lst','grp'].forEach(t => document.getElementById('rec-'+t).style.display = t===tab?'block':'none');
-  activeRecTab = tab;
-  if (tab==='cal') renderCal();
-  else if (tab==='lst') renderLst();
-  else renderGrp();
+  ['cal','lst','grp'].forEach(t=>document.getElementById('rec-'+t).style.display=t===tab?'block':'none');
+  activeRecTab=tab;
+  if(tab==='cal')renderCal();else if(tab==='lst')renderLst();else renderGrp();
 }
- 
-function setGraphMode(mode, btn) {
-  graphMode = mode;
-  document.querySelectorAll('.graph-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  renderGrp();
-}
- 
-// ─── CALENDAR ───
-function renderCal() {
-  const el = document.getElementById('rec-cal');
-  const y = calCurDate.getFullYear(), m = calCurDate.getMonth();
-  const first = new Date(y, m, 1).getDay();
-  const days = new Date(y, m+1, 0).getDate();
-  const todayStr = today();
-  const recDates = new Set(D.records.map(r => r.date));
- 
-  let html = `<div class="cal-nav">
+function setGraphMode(mode,btn){graphMode=mode;document.querySelectorAll('.graph-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderGrp();}
+
+function renderCal(){
+  const el=document.getElementById('rec-cal');
+  const y=calCurDate.getFullYear(),m=calCurDate.getMonth();
+  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  const todayStr=today(),recDates=new Set(D.records.map(r=>r.date));
+  let html=`<div class="cal-nav">
     <button class="btn btn-secondary" style="padding:7px 13px;" onclick="changeMonth(-1)">◀</button>
     <div class="cal-month">${y}年 ${m+1}月</div>
     <button class="btn btn-secondary" style="padding:7px 13px;" onclick="changeMonth(1)">▶</button>
   </div>
   <div class="cal-grid">
-    ${['日','月','火','水','木','金','土'].map((d,i) => `<div class="cal-lbl ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('')}
+    ${['日','月','火','水','木','金','土'].map((d,i)=>`<div class="cal-lbl ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('')}
     ${Array(first).fill('<div class="cal-day empty"></div>').join('')}
     ${Array.from({length:days},(_,n)=>{
-      const d = n+1;
-      const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dow = new Date(y,m,d).getDay();
-      const isToday = ds===todayStr, isDone = recDates.has(ds);
-      const cls = [isToday?'today':'', isDone?'done':'', !isDone&&dow===0?'sun-c':'', !isDone&&dow===6?'sat-c':''].filter(Boolean).join(' ');
-      return `<div class="cal-day ${cls}" onclick="showDayDetail('${ds}')">${d}${isDone?'<div class="cal-dot"></div>':''}</div>`;
+      const d=n+1,ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dow=new Date(y,m,d).getDay();
+      const isToday=ds===todayStr,isDone=recDates.has(ds);
+      let cls=[isDone?'done':'',isToday&&!isDone?'today':'',!isDone&&dow===0?'sun-c':'',!isDone&&dow===6?'sat-c':''].filter(Boolean).join(' ');
+      if(isDone){
+        return`<div class="cal-day ${cls}" onclick="showDayDetail('${ds}')"><div class="cal-iine">👍</div><div class="cal-day-num">${d}</div></div>`;
+      }
+      return`<div class="cal-day ${cls}" onclick="showDayDetail('${ds}')"><div class="cal-day-num">${d}</div></div>`;
     }).join('')}
   </div>`;
- 
-  const mRecs = D.records.filter(r => r.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`));
-  const mCal = mRecs.reduce((s,r) => s+r.totalCalories, 0);
-  html += `<div class="card" style="margin-top:16px;">
-    <div class="cal-summary">
-      <div><div class="cal-sum-val">${mRecs.length}</div><div class="cal-sum-lbl">達成日数</div></div>
-      <div style="width:1px;background:var(--border);"></div>
-      <div><div class="cal-sum-val">${mCal.toLocaleString()}</div><div class="cal-sum-lbl">月間消費 kcal</div></div>
-    </div>
-  </div>`;
- 
-  el.innerHTML = html;
+  const mRecs=D.records.filter(r=>r.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`));
+  const mCal=mRecs.reduce((s,r)=>s+r.totalCalories,0);
+  html+=`<div class="card" style="margin-top:16px;"><div class="cal-summary">
+    <div><div class="cal-sum-val">${mRecs.length}</div><div class="cal-sum-lbl">達成日数</div></div>
+    <div style="width:1px;background:var(--border);"></div>
+    <div><div class="cal-sum-val">${mCal.toLocaleString()}</div><div class="cal-sum-lbl">月間消費 kcal</div></div>
+  </div></div>`;
+  el.innerHTML=html;
 }
- 
-function changeMonth(d) { calCurDate.setMonth(calCurDate.getMonth()+d); renderCal(); }
- 
-function showDayDetail(ds) {
-  const r = D.records.find(x => x.date===ds);
-  if (!r) return;
-  document.getElementById('day-title').textContent = fmtDate(ds);
-  let html = `<div style="margin-bottom:12px;">
+function changeMonth(d){calCurDate.setMonth(calCurDate.getMonth()+d);renderCal();}
+
+function showDayDetail(ds){
+  const r=D.records.find(x=>x.date===ds);if(!r)return;
+  document.getElementById('day-title').textContent=fmtDate(ds);
+  let html=`<div style="margin-bottom:12px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <span style="color:var(--text2);font-size:13px;">合計消費カロリー</span>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);">${r.totalCalories} <span style="font-size:13px;font-family:'Noto Sans JP';color:var(--text2);">kcal</span></span>
     </div>
     <div style="font-size:12px;color:var(--text2);">体重: ${r.weight}kg ／ 基礎代謝: ${r.bmr}kcal</div>
-  </div>
-  <div class="divider"></div>`;
-  r.exercises.forEach(e => {
-    html += `<div class="wh-item"><span>${e.name}<br><span style="font-size:10px;color:var(--text2);">MET${e.mets} × ${e.duration}分</span></span><span style="font-weight:700;color:var(--accent);">${e.calories} kcal</span></div>`;
-  });
-  document.getElementById('day-content').innerHTML = html;
+  </div><div class="divider"></div>`;
+  r.exercises.forEach(e=>{html+=`<div class="wh-item"><span>${e.name}<br><span style="font-size:10px;color:var(--text2);">MET${e.mets} × ${e.duration}分</span></span><span style="font-weight:700;color:var(--accent);">${e.calories} kcal</span></div>`;});
+  document.getElementById('day-content').innerHTML=html;
   document.getElementById('day-overlay').classList.remove('hide');
 }
-function closeDayDetail() { document.getElementById('day-overlay').classList.add('hide'); }
- 
-// ─── LIST ───
-function renderLst() {
-  const el = document.getElementById('rec-lst');
-  if (!D.records.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-txt">記録がありません</div></div>`;
-    return;
-  }
-  const sorted = [...D.records].reverse();
-  el.innerHTML = `<div class="card">${sorted.map(r => `
+function closeDayDetail(){document.getElementById('day-overlay').classList.add('hide');}
+
+function renderLst(){
+  const el=document.getElementById('rec-lst');
+  if(!D.records.length){el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-txt">記録がありません</div></div>`;return;}
+  el.innerHTML=`<div class="card">${[...D.records].reverse().map(r=>`
     <div class="rec-item" onclick="showDayDetail('${r.date}')" style="cursor:pointer;">
-      <div class="rec-top">
-        <div class="rec-date">${fmtDate(r.date)}</div>
-        <div class="rec-cal">${r.totalCalories}<span style="font-size:11px;font-family:'Noto Sans JP';color:var(--text2);"> kcal</span></div>
-      </div>
+      <div class="rec-top"><div class="rec-date">${fmtDate(r.date)}</div><div class="rec-cal">${r.totalCalories}<span style="font-size:11px;font-family:'Noto Sans JP';color:var(--text2);"> kcal</span></div></div>
       <div class="rec-detail">${r.exercises.map(e=>`${e.name}(${e.duration}分)`).join(' / ')}</div>
       <div class="rec-detail">体重 ${r.weight}kg ／ 基礎代謝 ${r.bmr}kcal</div>
-    </div>`).join('')}
-  </div>`;
+    </div>`).join('')}</div>`;
 }
- 
-// ─── GRAPH ───
-function renderGrp() {
-  const ctx = document.getElementById('main-chart').getContext('2d');
-  const now = new Date();
-  let labels = [], vals = [];
- 
-  if (graphMode === 'week') {
-    for (let w=7; w>=0; w--) {
-      const ws = new Date(now); ws.setDate(now.getDate() - w*7 - now.getDay());
-      const we = new Date(ws); we.setDate(ws.getDate()+6);
-      labels.push(`${ws.getMonth()+1}/${ws.getDate()}`);
-      vals.push(D.records.filter(r => { const d=new Date(r.date+'T00:00:00'); return d>=ws&&d<=we; }).reduce((s,r)=>s+r.totalCalories,0));
-    }
+
+function renderGrp(){
+  const ctx=document.getElementById('main-chart').getContext('2d');
+  const now=new Date();let labels=[],vals=[],type='bar',fill=false,tension=0;
+  if(graphMode==='day'){
+    type='line';fill=true;tension=0.35;
+    for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().split('T')[0];labels.push(i===0?'今日':`${d.getMonth()+1}/${d.getDate()}`);const r=D.records.find(x=>x.date===ds);vals.push(r?r.totalCalories:0);}
+  } else if(graphMode==='week'){
+    for(let w=7;w>=0;w--){const ws=new Date(now);ws.setDate(now.getDate()-w*7-now.getDay());const we=new Date(ws);we.setDate(ws.getDate()+6);labels.push(`${ws.getMonth()+1}/${ws.getDate()}`);vals.push(D.records.filter(r=>{const d=new Date(r.date+'T00:00:00');return d>=ws&&d<=we;}).reduce((s,r)=>s+r.totalCalories,0));}
   } else {
-    for (let mo=5; mo>=0; mo--) {
-      const d = new Date(now.getFullYear(), now.getMonth()-mo, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      labels.push(`${d.getMonth()+1}月`);
-      vals.push(D.records.filter(r=>r.date.startsWith(key)).reduce((s,r)=>s+r.totalCalories,0));
-    }
+    for(let mo=5;mo>=0;mo--){const d=new Date(now.getFullYear(),now.getMonth()-mo,1);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;labels.push(`${d.getMonth()+1}月`);vals.push(D.records.filter(r=>r.date.startsWith(key)).reduce((s,r)=>s+r.totalCalories,0));}
   }
- 
-  if (chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: '消費カロリー (kcal)',
-        data: vals,
-        backgroundColor: 'rgba(0,230,118,0.25)',
-        borderColor: '#00e676',
-        borderWidth: 2,
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#e8ecf4', font: { family: 'Noto Sans JP', size: 12 } } } },
-      scales: {
-        x: { ticks: { color: '#6e7d97', font: { family: 'Noto Sans JP' } }, grid: { color: '#1c2a42' } },
-        y: { ticks: { color: '#6e7d97', font: { family: 'Noto Sans JP' } }, grid: { color: '#1c2a42' }, beginAtZero: true }
-      }
-    }
-  });
+  if(chart)chart.destroy();
+  chart=new Chart(ctx,{type,data:{labels,datasets:[{label:'消費カロリー (kcal)',data:vals,backgroundColor:type==='line'?'rgba(0,230,118,0.12)':'rgba(0,230,118,0.25)',borderColor:'#00e676',borderWidth:2,borderRadius:type==='bar'?6:0,borderSkipped:false,fill,tension,pointBackgroundColor:'#00e676',pointRadius:type==='line'?3:0,pointHoverRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e8ecf4',font:{family:'Noto Sans JP',size:12}}}},scales:{x:{ticks:{color:'#6e7d97',font:{family:'Noto Sans JP',size:10},maxRotation:45,autoSkip:true,maxTicksLimit:10},grid:{color:'#1c2a42'}},y:{ticks:{color:'#6e7d97',font:{family:'Noto Sans JP'}},grid:{color:'#1c2a42'},beginAtZero:true}}}});
 }
- 
-// ════════════════════════════════════════════
-// PROFILE
-// ════════════════════════════════════════════
-function renderProfile() {
-  const p = D.profile;
-  document.getElementById('p-name').value = p.name||'';
-  document.getElementById('p-gender').value = p.gender||'male';
-  document.getElementById('p-age').value = p.age||'';
-  document.getElementById('p-height').value = p.height||'';
-  document.getElementById('p-weight').value = curWeight()||'';
- 
-  const el = document.getElementById('wh-list');
-  const h = p.weightHistory || [];
-  el.innerHTML = h.length
-    ? [...h].reverse().slice(0,15).map(w => `<div class="wh-item"><span>${fmtDate(w.date)}</span><span style="font-weight:700;">${w.weight} kg</span></div>`).join('')
-    : '<div style="color:var(--text2);font-size:13px;">記録なし</div>';
- 
-  // Notification status
-  const ns = document.getElementById('notif-status');
-  if ('Notification' in window) {
-    ns.textContent = Notification.permission === 'granted' ? '✅ 通知は許可されています' : Notification.permission === 'denied' ? '❌ 通知がブロックされています（ブラウザ設定を確認）' : '⚠️ 通知は未許可です';
-  } else {
-    ns.textContent = 'このブラウザは通知に未対応です';
-  }
+
+// ════ PROFILE ════
+function renderProfile(){
+  const p=D.profile;
+  document.getElementById('p-name').value=p.name||'';document.getElementById('p-gender').value=p.gender||'male';
+  document.getElementById('p-age').value=p.age||'';document.getElementById('p-height').value=p.height||'';
+  document.getElementById('p-weight').value=curWeight()||'';
+  const h=p.weightHistory||[];
+  document.getElementById('wh-list').innerHTML=h.length?[...h].reverse().slice(0,15).map(w=>`<div class="wh-item"><span>${fmtDate(w.date)}</span><span style="font-weight:700;">${w.weight} kg</span></div>`).join(''):'<div style="color:var(--text2);font-size:13px;">記録なし</div>';
+  const ns=document.getElementById('notif-status');
+  if('Notification' in window)ns.textContent=Notification.permission==='granted'?'✅ 通知は許可されています':Notification.permission==='denied'?'❌ 通知がブロックされています':'⚠️ 通知は未許可です';
+  else ns.textContent='このブラウザは通知に未対応です';
 }
- 
-function saveProfile() {
-  const age = parseInt(document.getElementById('p-age').value);
-  const height = parseFloat(document.getElementById('p-height').value);
-  const weight = parseFloat(document.getElementById('p-weight').value);
-  if (!age || !height) { toast('年齢と身長は必須です', true); return; }
-  if (!weight || weight <= 0) { toast('体重は必須です', true); return; }
- 
-  D.profile.name = document.getElementById('p-name').value.trim();
-  D.profile.gender = document.getElementById('p-gender').value;
-  D.profile.age = age;
-  D.profile.height = height;
- 
-  const t = today();
-  const ex = D.profile.weightHistory.find(w => w.date === t);
-  if (ex) ex.weight = weight; else D.profile.weightHistory.push({ date: t, weight });
- 
-  save(); renderProfile(); toast('✅ プロフィールを保存しました');
+function saveProfile(){
+  const age=parseInt(document.getElementById('p-age').value),height=parseFloat(document.getElementById('p-height').value),weight=parseFloat(document.getElementById('p-weight').value);
+  if(!age||!height){toast('年齢と身長は必須です',true);return;}
+  if(!weight||weight<=0){toast('体重は必須です',true);return;}
+  D.profile.name=document.getElementById('p-name').value.trim();D.profile.gender=document.getElementById('p-gender').value;D.profile.age=age;D.profile.height=height;
+  const t=today(),ex=D.profile.weightHistory.find(w=>w.date===t);
+  if(ex)ex.weight=weight;else D.profile.weightHistory.push({date:t,weight});
+  save();renderProfile();toast('✅ プロフィールを保存しました');
 }
- 
-// ════════════════════════════════════════════
-// NOTIFICATIONS
-// ════════════════════════════════════════════
-function askNotifPerm(cb) {
-  if (!('Notification' in window)) { toast('通知はサポートされていません', true); return; }
-  if (Notification.permission === 'granted') { if(cb) cb(); return; }
-  Notification.requestPermission().then(p => {
-    if (p === 'granted') { toast('🔔 通知が許可されました'); if(cb) cb(); }
-    else toast('通知が拒否されました', true);
-    renderProfile();
-  });
+
+// ════ NOTIFICATIONS ════
+function askNotifPerm(cb){
+  if(!('Notification' in window)){toast('通知はサポートされていません',true);return;}
+  if(Notification.permission==='granted'){if(cb)cb();return;}
+  Notification.requestPermission().then(p=>{if(p==='granted'){toast('🔔 通知が許可されました');if(cb)cb();}else toast('通知が拒否されました',true);renderProfile();});
 }
- 
-let lastNotifCheck = '';
-function checkNotifs() {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const now = new Date();
-  const dow = now.getDay();
-  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const key = dow + '-' + t;
-  if (key === lastNotifCheck) return;
-  lastNotifCheck = key;
-  D.videos.forEach(v => {
-    const s = D.schedule[v.id];
-    if (!s || !s.notificationEnabled || !s.days[dow] || s.notificationTime !== t) return;
-    new Notification('FitLog 🏃 運動の時間です！', { body: `${v.name||'運動'} を始めましょう 💪`, icon: '🏃' });
-  });
+let lastNotifCheck='';
+function checkNotifs(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const now=new Date(),dow=now.getDay(),t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const key=dow+'-'+t;if(key===lastNotifCheck)return;lastNotifCheck=key;
+  D.videos.forEach(v=>{const s=D.schedule[v.id];if(!s||!s.notificationEnabled||!s.days[dow]||s.notificationTime!==t)return;new Notification('FitLog 🏃 運動の時間です！',{body:`${v.name||'運動'} を始めましょう 💪`});});
 }
-setInterval(checkNotifs, 30000);
- 
-// ════════════════════════════════════════════
-// EXPORT
-// ════════════════════════════════════════════
-function exportCSV() {
-  if (!D.records.length) { toast('記録がありません', true); return; }
-  const rows = [['日付','体重(kg)','基礎代謝(kcal)','運動名','MET値','時間(分)','消費カロリー(kcal)','日合計(kcal)']];
-  D.records.forEach(r => {
-    if (r.exercises.length) {
-      r.exercises.forEach(e => rows.push([r.date, r.weight, r.bmr, e.name, e.mets, e.duration, e.calories, r.totalCalories]));
-    } else {
-      rows.push([r.date, r.weight, r.bmr, '', '', '', '', r.totalCalories]);
-    }
-  });
-  dl('fitlog_' + today() + '.csv', rows.map(r=>r.join(',')).join('\n'), 'text/csv;charset=utf-8;');
-  toast('📊 CSVエクスポート完了');
+setInterval(checkNotifs,30000);
+
+// ════ HELP ════
+function showHelp(){document.getElementById('help-overlay').classList.remove('hide');}
+function closeHelp(e){if(e&&e.target!==document.getElementById('help-overlay'))return;document.getElementById('help-overlay').classList.add('hide');}
+
+// ════ EXPORT ════
+function exportCSV(){
+  if(!D.records.length){toast('記録がありません',true);return;}
+  const rows=[['日付','体重(kg)','基礎代謝(kcal)','種目名','MET値','運動時間(分)','消費カロリー(kcal)','日合計(kcal)']];
+  D.records.forEach(r=>{if(r.exercises.length)r.exercises.forEach(e=>rows.push([r.date,r.weight,r.bmr,e.name,e.mets,e.duration,e.calories,r.totalCalories]));else rows.push([r.date,r.weight,r.bmr,'','','','',r.totalCalories]);});
+  dl('fitlog_'+today()+'.csv',rows.map(r=>r.join(',')).join('\n'),'text/csv;charset=utf-8;');toast('📊 CSVエクスポート完了');
 }
- 
-function exportTXT() {
-  if (!D.records.length) { toast('記録がありません', true); return; }
-  let t = `FitLog 運動記録\nエクスポート: ${new Date().toLocaleString('ja-JP')}\n${'='.repeat(38)}\n\n`;
-  D.records.forEach(r => {
-    t += `📅 ${fmtDate(r.date)}\n   体重: ${r.weight}kg ／ 基礎代謝: ${r.bmr}kcal\n`;
-    r.exercises.forEach(e => t += `   ▶ ${e.name}: MET${e.mets} × ${e.duration}分 = ${e.calories}kcal\n`);
-    t += `   合計: ${r.totalCalories}kcal\n\n`;
-  });
-  dl('fitlog_' + today() + '.txt', t, 'text/plain;charset=utf-8;');
-  toast('📄 テキストエクスポート完了');
+function exportTXT(){
+  if(!D.records.length){toast('記録がありません',true);return;}
+  let t=`FitLog 運動記録\nエクスポート: ${new Date().toLocaleString('ja-JP')}\n${'='.repeat(38)}\n\n`;
+  D.records.forEach(r=>{t+=`📅 ${fmtDate(r.date)}\n   体重: ${r.weight}kg ／ 基礎代謝: ${r.bmr}kcal\n`;r.exercises.forEach(e=>t+=`   ▶ ${e.name}: MET${e.mets} × ${e.duration}分 = ${e.calories}kcal\n`);t+=`   合計: ${r.totalCalories}kcal\n\n`;});
+  dl('fitlog_'+today()+'.txt',t,'text/plain;charset=utf-8;');toast('📄 テキストエクスポート完了');
 }
- 
-function dl(name, content, mime) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\uFEFF'+content], {type: mime}));
-  a.download = name; a.click();
-}
- 
-// ════════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════════
+function dl(name,content,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+content],{type:mime}));a.download=name;a.click();}
+
+// ════ TOAST ════
 let tTimer;
-function toast(msg, isErr) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast' + (isErr ? ' err' : '');
-  requestAnimationFrame(() => el.classList.add('show'));
-  clearTimeout(tTimer);
-  tTimer = setTimeout(() => el.classList.remove('show'), 2600);
+function toast(msg,isErr){
+  const el=document.getElementById('toast');el.textContent=msg;el.className='toast'+(isErr?' err':'');
+  requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(tTimer);tTimer=setTimeout(()=>el.classList.remove('show'),2800);
 }
- 
-// ════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════
+
+// ════ INIT ════
 renderToday();
 </script>
 </body>
